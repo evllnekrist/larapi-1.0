@@ -14,7 +14,7 @@ About this project : using mySql & laravel. Laravel has the most extensive and t
 This api it self still on development but stable to test on postman. [Click here](https://drive.google.com/open?id=1ZOW44XrxHNL09aNO19GBzMkIVWKEFv5p) to download the postman collection. 
 
 Using that postman collection would be easier if you also set the environment, in case later you'll have several server or to just cope with repetitive declaration. You could set itS like this, 
-![how to set environment in postman](https://drive.google.com/file/d/1wwjjbNqRjS8AkZK5Qs8bkiIP61v3ZEkI/view?usp=sharing) 
+![how to set environment in postman](https://drive.google.com/open?id=1wwjjbNqRjS8AkZK5Qs8bkiIP61v3ZEkI) 
 
 
 ## How to Implement
