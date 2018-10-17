@@ -11,9 +11,10 @@
 
 About this project : using mySql & laravel. Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of any modern web application framework, making it a breeze to get started learning the framework.
 
-This api it self still on development but stable to test on postman. [Click here](https://drive.google.com/open?id=1ZOW44XrxHNL09aNO19GBzMkIVWKEFv5p) to download the postman collection. 
+This api it self still on development but stable to test on postman. [Click here](https://drive.google.com/open?id=1ZOW44XrxHNL09aNO19GBzMkIVWKEFv5p) to download the postman collection. Using that postman collection would be easier if you also set the environment, in case later you'll have several server or to just cope with repetitive declaration. 
 
-Using that postman collection would be easier if you also set the environment, in case later you'll have several server or to just cope with repetitive declaration. You could set it like this, ![how to set environment in postman](public/images/setEnvironmentPostman.PNG) 
+You could set it like this:
+![how to set environment in postman](public/images/setEnvironmentPostman.PNG) 
 
 
 ## How to Implement
