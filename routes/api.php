@@ -16,20 +16,19 @@ use Illuminate\Http\Request;
 Route::middleware('auth:api')->get('/user', function (Request $request) {
     return $request->user();
 });
+Route::post('/auth/login', 'UserController@authenticate');
 
-Route::group(['middleware' => 'cors', 'prefix' => '/auth'], function() {
-    Route::post('/login', 'UserController@authenticate');
-    Route::post('/register', 'UserController@register');
-    Route::post('/logout/{api_token}', 'UserController@logout');
-    Route::get('/list/{api_token}', 'UserController@list');
-    Route::get('/show/{id}/{api_token}', 'UserController@show');
-    Route::post('/update', 'UserController@update');
-});
 
-Route::group(['middleware' => 'cors'], function() {
-    Route::get('/articles', 'ArticleController@index');
+Route::group(['middleware' => ['jwt.auth']], function() {
+    Route::get('/auth/list/{limit}', 'UserController@list');
+    Route::get('/auth/show/{id}', 'UserController@show');
+    Route::post('/auth/update', 'UserController@update');
+    Route::post('/auth/logout', 'UserController@logout');
+    Route::post('/auth/register', 'UserController@register');
+
+    Route::get('/articles/{limit}', 'ArticleController@index');
     Route::get('/articles/{id}', 'ArticleController@show');
     Route::post('/articles/save', 'ArticleController@store');
     Route::post('/articles/update', 'ArticleController@update');
-    Route::get('/articles/delete/{id}/{api_token}', 'ArticleController@delete');
+    Route::get('/articles/delete/{id}', 'ArticleController@delete');
 });

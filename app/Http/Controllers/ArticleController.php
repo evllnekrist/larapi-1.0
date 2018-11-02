@@ -22,11 +22,13 @@ class ArticleController extends ApiController
     }
 
     public function index(){
-    	$limit = Input::get('limit') ?: 3;
-
+    	$limit = Input::get('limit') ?: 5;
     	$articles = Article::with('user')->paginate($limit);
-
-    	return $this->respondWithPagination($articles, ['articles' => $this->articleTransformer->transformCollection($articles->all())], 'Records Found!');
+    	return $this->respondWithPagination(
+            $articles, 
+            ['articles' => $this->articleTransformer->transformCollection($articles->all())], 
+            'Records Found!'
+        );
     }
 
     public function show($id){
@@ -50,7 +52,6 @@ class ArticleController extends ApiController
 
     public function store(Request $request){
     	$rules = array(
-    		'api_token' => 'required',
     		'title' => 'required',
     		'slug' => 'required|unique:articles',
     		'excerpts' => 'required',
@@ -63,10 +64,10 @@ class ArticleController extends ApiController
     		return $this->respondValidationError('Fields Validation Failed.', $validator->errors());
     	}
 
-    	$api_token =  $request['api_token']; //harus login dulu
+    	$token =  $request->bearerToken(); //harus login dulu
 
     	try{
-    		$user = JWTAuth::toUser($api_token);
+    		$user = JWTAuth::toUser($token);
 
     		$article = new Article();
     		$article->user_id = $user->id;
@@ -85,7 +86,6 @@ class ArticleController extends ApiController
     public function update(Request $request){
     	$rules = array(
     		'id' => 'required|integer',
-    		'api_token' => 'required',
     		'title' => 'required',
     		'slug' => 'required|unique:articles',
     		'excerpts' => 'required',
@@ -98,10 +98,10 @@ class ArticleController extends ApiController
     		return $this->respondValidationError('Fields Validation Failed.', $validator->errors());
     	}
 
-    	$api_token = $request['api_token'];
+    	$token = $request->bearerToken();
 
     	try{
-    		$user = JWTAuth::toUser($api_token);
+    		$user = JWTAuth::toUser($token);
 
     		$article = Article::find($request['id']);
     		$article->user_id = $user->id;
@@ -117,10 +117,10 @@ class ArticleController extends ApiController
     	}
     }
 
-    public function delete($id, $api_token){
+    public function delete($id, Request $request){
+        $token = $request->bearerToken();
+        $user = JWTAuth::toUser($token);
     	try{
-    		$user = JWTAuth::toUser($api_token);
-
     		$article = Article::where('id', $id)->where('user_id', $user->id); 
     		$article->delete();
 

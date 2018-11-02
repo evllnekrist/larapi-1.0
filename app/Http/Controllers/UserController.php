@@ -102,8 +102,9 @@ class UserController extends ApiController
     	}
     }
 
-    public function logout($api_token){
+    public function logout(Request $request){
     	try{
+            $api_token = $request->bearerToken();
     		$user = JWTAuth::toUser($api_token);
     		$user->api_token = NULL;
     		$user->save();
@@ -119,10 +120,8 @@ class UserController extends ApiController
     	}
     }
 
-    public function list($api_token){
+    public function list(){
         try{
-            $user = JWTAuth::toUser($api_token);
-        
             $limit = Input::get('limit') ?: 5;
             $users = User::paginate($limit);
             return $this->respondWithPagination(
@@ -135,7 +134,7 @@ class UserController extends ApiController
         }
     }
 
-    public function show($id, $api_token){
+    public function show($id){
         $user = User::find($id);
 
         if(!$user){
@@ -157,7 +156,6 @@ class UserController extends ApiController
     public function update(Request $request){
         $rules = array(
             'id' => 'required|integer',
-            'api_token' => 'required',
             'name' => 'nullable|max:255',
             'email' => 'nullable|email|max:255|unique:users',
             'password' => 'nullable|min:6|confirmed',
@@ -169,17 +167,19 @@ class UserController extends ApiController
         if($validator->fails()){
             return $this->respondValidationError('Fields Validation Failed.', $validator->errors());
         }else{
-            $api_token = $request['api_token'];
+            $api_token = $request->bearerToken();
 
             try{
-                $user = JWTAuth::toUser($api_token);
-
                 $user_updated = User::find($request['id']);
-                $user_updated->name = $request['name'];
+                if($request['name'] != null){
+                    $user_updated->name = $request['name'];
+                }
                 if($request['email'] != null){ //perlu karena didefine unique
                     $user_updated->email = $request['email'];
                 }
-                $user_updated->password = \Hash::make($request['password']);
+                if($request['password'] != null){
+                    $user_updated->password = \Hash::make($request['password']);
+                }
                 $user_updated->save();
 
                 return $this->respondCreated('User info updated successfully!', $this->userTransformer->transform($user_updated));
