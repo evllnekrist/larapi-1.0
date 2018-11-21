@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 use App\User; 
+use App\MasterMenu;
+use App\MasterPermission;
 use Illuminate\Http\Request;
 use App\Http\Requests;
 use JWTAuth;
@@ -84,8 +86,11 @@ class UserController extends ApiController
     	$rules = array(
     		'name' => 'required|max:255',
     		'email' => 'required|email|max:255|unique:users',
+            'sex' => 'required|max:10',
+            'authority' => 'required',
+            'institution' => 'required|max:255',
     		'password' => 'required|min:6|confirmed',
-    		'password_confirmation' => 'required|min:3'
+    		'password_confirmation' => 'required|min:6'
     	);
 
     	$validator = Validator::make($request->all(), $rules);
@@ -96,6 +101,9 @@ class UserController extends ApiController
             $user = User::create([
                 'name' => $request['name'],
                 'email' => $request['email'],
+                'sex' => $request['sex'],
+                'authority' => $request['authority'],
+                'institution' => $request['institution'],
                 'password' => \Hash::make($request['password'])
             ]);
             return $this->_login($request['email'], $request['password']);
@@ -134,7 +142,7 @@ class UserController extends ApiController
         }
     }
 
-    public function show($id){
+    public function single($id){
         $user = User::find($id);
 
         if(!$user){
@@ -157,7 +165,10 @@ class UserController extends ApiController
         $rules = array(
             'id' => 'required|integer',
             'name' => 'nullable|max:255',
-            'email' => 'nullable|email|max:255|unique:users',
+            'email' => 'nullable|email|max:255',
+            'sex' => 'nullable|max:10',
+            'authority' => 'nullable',
+            'institution' => 'nullable|max:255',
             'password' => 'nullable|min:6|confirmed',
             'password_confirmation' => 'nullable|min:3'
         );
@@ -171,12 +182,11 @@ class UserController extends ApiController
 
             try{
                 $user_updated = User::find($request['id']);
-                if($request['name'] != null){
-                    $user_updated->name = $request['name'];
-                }
-                if($request['email'] != null){ //perlu karena didefine unique
-                    $user_updated->email = $request['email'];
-                }
+                if($request['name'] != null){$user_updated->name = $request['name'];}
+                if($request['email'] != null){$user_updated->email = $request['email'];}
+                if($request['sex'] != null){$user_updated->sex = $request['sex'];}
+                if($request['authority'] != null){$user_updated->authority = $request['authority'];}
+                if($request['institution'] != null){$user_updated->institution = $request['institution'];}
                 if($request['password'] != null){
                     $user_updated->password = \Hash::make($request['password']);
                 }
@@ -186,6 +196,22 @@ class UserController extends ApiController
             }catch(JWTException $e){
                 return $this->respondInternalError("An error occurred while performing an action!");
             }
+        }
+    }
+
+    public function personal_menu(Request $request){
+        try{
+            $api_token = $request->bearerToken();
+            $user = JWTAuth::toUser($api_token);
+            $result = MasterPermission::with(
+                array('masterMenu'=>function($query){
+                    $query->select('id','name');
+                }));
+            $result = $result->where('master_permission.authority', $user->authority)->get();
+            return $this->respondCreated('Menu retrieve succesfully ..', $result);
+
+        }catch(JWTException $e){
+            return $this->respondInternalError("An error occurred while performing an action!");
         }
     }
 

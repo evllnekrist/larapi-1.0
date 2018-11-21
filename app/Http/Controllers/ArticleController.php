@@ -31,7 +31,7 @@ class ArticleController extends ApiController
         );
     }
 
-    public function show($id){
+    public function single($id){
     	$article = Article::with('user')->find($id);
 
     	if(!$article){
@@ -52,10 +52,10 @@ class ArticleController extends ApiController
 
     public function store(Request $request){
     	$rules = array(
-    		'title' => 'required',
-    		'slug' => 'required|unique:articles',
-    		'excerpts' => 'required',
-    		'body' => 'required',
+    		// 'title' => 'required',
+    		// 'slug' => 'required|unique:articles',
+    		// 'excerpts' => 'required',
+    		// 'body' => 'required',
     	);
 
     	$validator = Validator::make($request->all(), $rules);
@@ -70,7 +70,7 @@ class ArticleController extends ApiController
     		$user = JWTAuth::toUser($token);
 
     		$article = new Article();
-    		$article->user_id = $user->id;
+    		$article->created_by = $user->id;
     		$article->title = $request['title'];
     		$article->slug = $request['slug'];
     		$article->excerpts = $request['excerpts'];
@@ -104,7 +104,7 @@ class ArticleController extends ApiController
     		$user = JWTAuth::toUser($token);
 
     		$article = Article::find($request['id']);
-    		$article->user_id = $user->id;
+    		$article->created_by = $user->id;
     		$article->title = $request['title'];
     		$article->slug = $request['slug'];
     		$article->excerpts = $request['excerpts'];
@@ -121,7 +121,7 @@ class ArticleController extends ApiController
         $token = $request->bearerToken();
         $user = JWTAuth::toUser($token);
     	try{
-    		$article = Article::where('id', $id)->where('user_id', $user->id); 
+    		$article = Article::where('id', $id)->where('created_by', $user->id); 
     		$article->delete();
 
     		return $this->respond([

@@ -11,9 +11,7 @@ class User extends Authenticatable
     protected $table = 'users';
     // protected $primaryKey = 'id';
 
-    protected $fillable = [
-        'name', 'email', 'password',
-    ];
+    protected $fillable = ['name','email','sex','authority','institution','password'];
 
     protected $hidden = [
         'password', 'api_token',
@@ -21,5 +19,8 @@ class User extends Authenticatable
 
     public function articles(){
         return $this->hasMany('App\Article');
+    }
+    public function masterAuthority(){
+        return $this->belongsTo('App\MasterAuthority', 'authority');
     }
 }

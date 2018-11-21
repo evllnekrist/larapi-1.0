@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class CreateUsersTable extends Migration
+class CreateMasterPermissionTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,17 +13,11 @@ class CreateUsersTable extends Migration
      */
     public function up()
     {
-        Schema::create('users', function (Blueprint $table) {
-            $table->increments('id');
-            $table->string('name');
-            $table->string('email')->unique();
-            $table->string('sex');
+        Schema::create('master_permission', function (Blueprint $table) {
+            $table->integer('menu')->unsigned();
+            $table->foreign('menu')->references('id')->on('master_menu');
             $table->integer('authority')->unsigned();
             $table->foreign('authority')->references('id')->on('master_authority');
-            $table->string('institution');
-            $table->string('password');
-            $table->text('api_token')->nullable();
-            // $table->rememberToken();
             $table->timestamps();
         });
     }
@@ -35,6 +29,6 @@ class CreateUsersTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('users');
+        Schema::dropIfExists('master_permission');
     }
 }
